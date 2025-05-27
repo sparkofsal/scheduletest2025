@@ -1,6 +1,12 @@
 const sheetID = '1wqrnyX4_b0gbuDLnYh-3cX_h5SZwoBq7_fG4BFTnL1w';
 
+const scrollContainer = document.getElementById('table-container');
+const scrollContent = document.getElementById('scroll-content');
 
+let scrollSpeed = 1; // pixels per frame
+let isPaused = false;
+let animationFrameId;
+let scrollStarted = false;
 
 function updateClock() {
   const now = new Date();
@@ -26,37 +32,33 @@ async function loadSchedule() {
     const table = document.createElement('table');
     const rows = json.table.rows;
 
-    // Create table header row
+    // Header row
     const headers = json.table.cols.map(col => `<th>${col.label}</th>`).join('');
     table.innerHTML += `<tr>${headers}</tr>`;
 
-    // Create table body rows
+    // Body rows
     rows.forEach(row => {
       const cells = row.c.map(cell => `<td>${cell?.v ?? ''}</td>`).join('');
       table.innerHTML += `<tr>${cells}</tr>`;
     });
 
-    // Duplicate the table for seamless scrolling
-    const scrollContent = document.getElementById('scroll-content');
+    // Clear previous content, add duplicated tables for seamless scroll
     scrollContent.innerHTML = '';
     scrollContent.appendChild(table.cloneNode(true));
     scrollContent.appendChild(table.cloneNode(true));
+
+    // Reset scroll position
+    scrollContainer.scrollTop = 0;
+
+    if (!scrollStarted) {
+      scrollStarted = true;
+      scrollStep();
+    }
   } catch (err) {
-    const scrollContent = document.getElementById('scroll-content');
     scrollContent.innerText = '⚠️ Failed to load schedule.';
     console.error('Error loading schedule:', err);
   }
 }
-
-// --- Smooth JS-controlled scroll ---
-
-const scrollContainer = document.getElementById('table-container');
-const scrollContent = document.getElementById('scroll-content');
-
-let scrollSpeed = 1; // pixels per frame
-let isPaused = false;
-let animationFrameId;
-let scrollStarted = false;
 
 function scrollStep() {
   if (!isPaused) {
@@ -70,57 +72,14 @@ function scrollStep() {
   animationFrameId = requestAnimationFrame(scrollStep);
 }
 
-scrollContainer.addEventListener('mouseenter', () => {
-  isPaused = true;
-});
+// Pause scroll on hover/focus
+scrollContainer.addEventListener('mouseenter', () => { isPaused = true; });
+scrollContainer.addEventListener('mouseleave', () => { isPaused = false; });
+scrollContainer.addEventListener('focusin', () => { isPaused = true; });
+scrollContainer.addEventListener('focusout', () => { isPaused = false; });
 
-scrollContainer.addEventListener('mouseleave', () => {
-  isPaused = false;
-});
-
-scrollContainer.addEventListener('focusin', () => {
-  isPaused = true;
-});
-
-scrollContainer.addEventListener('focusout', () => {
-  isPaused = false;
-});
-
-async function loadSchedule() {
-  try {
-    const url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&cacheBuster=${Date.now()}`;
-    const res = await fetch(url);
-    const text = await res.text();
-    const json = JSON.parse(text.substr(47).slice(0, -2));
-
-    const table = document.createElement('table');
-    const rows = json.table.rows;
-
-    const headers = json.table.cols.map(col => `<th>${col.label}</th>`).join('');
-    table.innerHTML += `<tr>${headers}</tr>`;
-
-    rows.forEach(row => {
-      const cells = row.c.map(cell => `<td>${cell?.v ?? ''}</td>`).join('');
-      table.innerHTML += `<tr>${cells}</tr>`;
-    });
-
-    scrollContent.innerHTML = '';
-    scrollContent.appendChild(table.cloneNode(true));
-    scrollContent.appendChild(table.cloneNode(true));
-
-    scrollContainer.scrollTop = 0;
-
-    if (!scrollStarted) {
-      scrollStarted = true;
-      scrollStep();
-    }
-  } catch (err) {
-    scrollContent.innerText = '⚠️ Failed to load schedule.';
-    console.error('Error loading schedule:', err);
-  }
-}
-
+// Start everything
 loadSchedule();
 updateClock();
-setInterval(loadSchedule, 3 * 60 * 1000);
-setInterval(updateClock, 1000);
+setInterval(loadSchedule, 3 * 60 * 1000); // reload every 3 mins
+setInterval(updateClock, 1000);            // update clock every sec
