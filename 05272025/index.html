@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TV Schedule Display</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #111;
+      color: #fff;
+      margin: 0;
+      padding: 2rem;
+      overflow: hidden;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin: 0 0 0.5rem 0;
+    }
+
+    #datetime {
+      font-size: 1.2rem;
+      color: #ccc;
+      margin-bottom: 1.5rem;
+    }
+
+    #table-container {
+      height: 70vh;
+      overflow-y: auto;
+      position: relative;
+      pointer-events: auto; /* Enable hover for pause */
+      border: 1px solid #444;
+      scroll-behavior: smooth;
+    }
+
+    #scroll-content {
+      display: inline-block;
+      width: 100%;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 1.5rem;
+      background-color: #111;
+    }
+
+    th, td {
+      padding: 1rem;
+      border: 1px solid #444;
+      text-align: center;
+    }
+
+    th {
+      background: #222;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    #footer {
+      margin-top: 2rem;
+      font-size: 0.9rem;
+      color: #aaa;
+    }
+  </style>
+</head>
+<body>
+  <h1> Live Schedule</h1>
+  <div id="datetime">Loading time...</div>
+  <div id="table-container" tabindex="0">
+    <div id="scroll-content"></div>
+  </div>
+  <div id="footer">Auto-scrolls • Updates every 3 minutes • Powered by Google Sheets</div>
+
+  <script src="script.js"></script>
+</body>
+</html>
