@@ -3,7 +3,7 @@ const scrollContainer = document.getElementById('table-container');
 const scrollContent = document.getElementById('scroll-content');
 const headerRow = document.getElementById('table-headers');
 
-let scrollSpeed = .5; //This value adjusts the automatic scroll speed by pixels per frame
+let scrollSpeed = 0.5;
 let isPaused = false;
 let scrollStarted = false;
 
@@ -34,28 +34,38 @@ async function loadSchedule() {
     headerRow.innerHTML = '';
     headerRow.innerHTML = cols.map(col => `<th>${col.label}</th>`).join('');
 
-    // Build body rows
-    scrollContent.innerHTML = '';
-    rows.forEach(row => {
+    // Helper to build one row
+    function createFormattedRow(rowData) {
       const tr = document.createElement('tr');
-      row.c.forEach(cell => {
+      rowData.c.forEach(cell => {
         const td = document.createElement('td');
-        td.textContent = cell?.v ?? '';
-        tr.appendChild(td);
-      });
-      scrollContent.appendChild(tr);
-    });
+        let value = cell?.v ?? '';
 
-    // Duplicate rows for seamless scrolling
-    rows.forEach(row => {
-      const tr = document.createElement('tr');
-      row.c.forEach(cell => {
-        const td = document.createElement('td');
-        td.textContent = cell?.v ?? '';
+        // Case 1: Google Sheets returns raw JS Date object
+        if (value instanceof Date) {
+          const mm = String(value.getMonth() + 1).padStart(2, '0');
+          const dd = String(value.getDate()).padStart(2, '0');
+          value = `${mm}/${dd}`;
+        }
+
+        // Case 2: Google returns string like 'Date(2025,4,15)'
+        if (typeof value === 'string' && /^Date\(\d+,\d+,\d+\)$/.test(value)) {
+          const [, y, m, d] = value.match(/Date\((\d+),(\d+),(\d+)\)/).map(Number);
+          const mm = String(m + 1).padStart(2, '0');
+          const dd = String(d).padStart(2, '0');
+          value = `${mm}/${dd}`;
+        }
+
+        td.textContent = value;
         tr.appendChild(td);
       });
-      scrollContent.appendChild(tr);
-    });
+      return tr;
+    }
+
+    // Clear and rebuild scrollable rows
+    scrollContent.innerHTML = '';
+    rows.forEach(row => scrollContent.appendChild(createFormattedRow(row)));
+    rows.forEach(row => scrollContent.appendChild(createFormattedRow(row))); // duplicate
 
     if (!scrollStarted) {
       scrollStarted = true;
@@ -70,7 +80,6 @@ async function loadSchedule() {
 function scrollStep() {
   if (!isPaused) {
     scrollContainer.scrollTop += scrollSpeed;
-
     const resetPoint = scrollContent.scrollHeight / 2;
     if (scrollContainer.scrollTop >= resetPoint) {
       scrollContainer.scrollTop = 0;
