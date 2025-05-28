@@ -1,24 +1,23 @@
 body {
   font-family: sans-serif;
-  background-color: #111;
+  background: #111;
   color: #fff;
-  margin: 0;
   padding: 2rem;
+  margin: 0;
 }
 
 h1 {
-  text-align: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.5rem;
 }
 
 #datetime {
-  text-align: center;
   margin-bottom: 1rem;
   font-size: 1.2rem;
+  color: #ccc;
 }
 
 #table-container {
-  height: 70vh; /* You can adjust this as needed */
+  height: 70vh;
   overflow-y: auto;
   border: 2px solid #444;
 }

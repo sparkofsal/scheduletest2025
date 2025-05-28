@@ -1,7 +1,7 @@
 const sheetID = '1wqrnyX4_b0gbuDLnYh-3cX_h5SZwoBq7_fG4BFTnL1w';
-
 const scrollContainer = document.getElementById('table-container');
 const scrollContent = document.getElementById('scroll-content');
+const headerRow = document.getElementById('table-headers');
 
 let scrollSpeed = 1;
 let isPaused = false;
@@ -9,7 +9,7 @@ let scrollStarted = false;
 
 function updateClock() {
   const now = new Date();
-  const formatted = now.toLocaleString('en-US', {
+  document.getElementById('datetime').textContent = now.toLocaleString('en-US', {
     weekday: 'short',
     year: 'numeric',
     month: 'short',
@@ -18,7 +18,6 @@ function updateClock() {
     minute: '2-digit',
     second: '2-digit',
   });
-  document.getElementById('datetime').textContent = formatted;
 }
 
 async function loadSchedule() {
@@ -28,32 +27,42 @@ async function loadSchedule() {
     const text = await res.text();
     const json = JSON.parse(text.substr(47).slice(0, -2));
 
-    const table = document.createElement('table');
     const rows = json.table.rows;
+    const cols = json.table.cols;
 
-    // Headers
-    const headers = json.table.cols.map(col => `<th>${col.label}</th>`).join('');
-    table.innerHTML += `<tr>${headers}</tr>`;
+    // Build headers
+    headerRow.innerHTML = '';
+    headerRow.innerHTML = cols.map(col => `<th>${col.label}</th>`).join('');
 
-    // Data Rows
+    // Build body rows
+    scrollContent.innerHTML = '';
     rows.forEach(row => {
-      const cells = row.c.map(cell => `<td>${cell?.v ?? ''}</td>`).join('');
-      table.innerHTML += `<tr>${cells}</tr>`;
+      const tr = document.createElement('tr');
+      row.c.forEach(cell => {
+        const td = document.createElement('td');
+        td.textContent = cell?.v ?? '';
+        tr.appendChild(td);
+      });
+      scrollContent.appendChild(tr);
     });
 
-    // Double content for infinite scroll effect
-    scrollContent.innerHTML = '';
-    scrollContent.appendChild(table.cloneNode(true));
-    scrollContent.appendChild(table.cloneNode(true));
-
-    scrollContainer.scrollTop = 0;
+    // Duplicate rows for seamless scrolling
+    rows.forEach(row => {
+      const tr = document.createElement('tr');
+      row.c.forEach(cell => {
+        const td = document.createElement('td');
+        td.textContent = cell?.v ?? '';
+        tr.appendChild(td);
+      });
+      scrollContent.appendChild(tr);
+    });
 
     if (!scrollStarted) {
       scrollStarted = true;
       scrollStep();
     }
   } catch (err) {
-    scrollContent.innerText = '⚠️ Failed to load schedule.';
+    scrollContent.innerHTML = '<tr><td colspan="100%">⚠️ Failed to load schedule.</td></tr>';
     console.error('Error loading schedule:', err);
   }
 }
@@ -62,7 +71,7 @@ function scrollStep() {
   if (!isPaused) {
     scrollContainer.scrollTop += scrollSpeed;
 
-    const resetPoint = Math.floor(scrollContent.scrollHeight / 2);
+    const resetPoint = scrollContent.scrollHeight / 2;
     if (scrollContainer.scrollTop >= resetPoint) {
       scrollContainer.scrollTop = 0;
     }
@@ -70,14 +79,12 @@ function scrollStep() {
   requestAnimationFrame(scrollStep);
 }
 
-// Pause on hover/focus
+// Pause scroll on hover
 scrollContainer.addEventListener('mouseenter', () => { isPaused = true; });
 scrollContainer.addEventListener('mouseleave', () => { isPaused = false; });
-scrollContainer.addEventListener('focusin', () => { isPaused = true; });
-scrollContainer.addEventListener('focusout', () => { isPaused = false; });
 
-// Initialize
+// Init
 loadSchedule();
 updateClock();
-setInterval(loadSchedule, 3 * 60 * 1000); // refresh schedule
-setInterval(updateClock, 1000); // update clock
+setInterval(loadSchedule, 3 * 60 * 1000);
+setInterval(updateClock, 1000);

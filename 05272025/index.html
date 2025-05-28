@@ -3,54 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>TPI Weekly Schedule</title>
-  <style>
-    body {
-      background: #111;
-      color: #fff;
-      font-family: sans-serif;
-      padding: 2rem;
-      margin: 0;
-    }
-
-    h1, #datetime {
-      text-align: center;
-    }
-
-    #table-container {
-      height: 500px;
-      overflow: hidden;
-      border: 2px solid #333;
-      margin-top: 1rem;
-    }
-
-    #scroll-content {
-      display: block;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 1.2rem;
-    }
-
-    th, td {
-      padding: 1rem;
-      border: 1px solid #444;
-      text-align: center;
-    }
-
-    th {
-      background: #222;
-    }
-  </style>
+  <title>TV Schedule Display</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <h1>Weekly Schedule</h1>
-  <div id="datetime">Loading time...</div>
+  <h1>TPI Weekly TV Schedule</h1>
+  <div id="datetime"></div>
 
   <div id="table-container">
-    <div id="scroll-content">Loading schedule...</div>
+    <table>
+      <thead>
+        <tr id="table-headers"></tr>
+      </thead>
+      <tbody id="scroll-content"></tbody>
+    </table>
   </div>
 
   <script src="script.js"></script>
