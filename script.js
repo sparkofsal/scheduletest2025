@@ -62,7 +62,7 @@ async function loadSchedule() {
       return tr;
     }
 
-    // Clear and rebuild scrollable rows
+    // This will create the rows and start scrolling
     scrollContent.innerHTML = '';
     rows.forEach(row => scrollContent.appendChild(createFormattedRow(row)));
     rows.forEach(row => scrollContent.appendChild(createFormattedRow(row))); // duplicate
@@ -77,6 +77,7 @@ async function loadSchedule() {
   }
 }
 
+// This function handles the scrolling logic
 function scrollStep() {
   if (!isPaused) {
     scrollContainer.scrollTop += scrollSpeed;
@@ -88,7 +89,7 @@ function scrollStep() {
   requestAnimationFrame(scrollStep);
 }
 
-// Pause scroll on hover
+// This will pause scrolling when mouse is over the container
 scrollContainer.addEventListener('mouseenter', () => { isPaused = true; });
 scrollContainer.addEventListener('mouseleave', () => { isPaused = false; });
 
