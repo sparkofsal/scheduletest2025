@@ -3,9 +3,8 @@ const sheetID = '1wqrnyX4_b0gbuDLnYh-3cX_h5SZwoBq7_fG4BFTnL1w';
 const scrollContainer = document.getElementById('table-container');
 const scrollContent = document.getElementById('scroll-content');
 
-let scrollSpeed = 1; // pixels per frame
+let scrollSpeed = 1;
 let isPaused = false;
-let animationFrameId;
 let scrollStarted = false;
 
 function updateClock() {
@@ -32,22 +31,21 @@ async function loadSchedule() {
     const table = document.createElement('table');
     const rows = json.table.rows;
 
-    // Header row
+    // Headers
     const headers = json.table.cols.map(col => `<th>${col.label}</th>`).join('');
     table.innerHTML += `<tr>${headers}</tr>`;
 
-    // Body rows
+    // Data Rows
     rows.forEach(row => {
       const cells = row.c.map(cell => `<td>${cell?.v ?? ''}</td>`).join('');
       table.innerHTML += `<tr>${cells}</tr>`;
     });
 
-    // Clear previous content, add duplicated tables for seamless scroll
+    // Double content for infinite scroll effect
     scrollContent.innerHTML = '';
     scrollContent.appendChild(table.cloneNode(true));
     scrollContent.appendChild(table.cloneNode(true));
 
-    // Reset scroll position
     scrollContainer.scrollTop = 0;
 
     if (!scrollStarted) {
@@ -69,17 +67,17 @@ function scrollStep() {
       scrollContainer.scrollTop = 0;
     }
   }
-  animationFrameId = requestAnimationFrame(scrollStep);
+  requestAnimationFrame(scrollStep);
 }
 
-// Pause scroll on hover/focus
+// Pause on hover/focus
 scrollContainer.addEventListener('mouseenter', () => { isPaused = true; });
 scrollContainer.addEventListener('mouseleave', () => { isPaused = false; });
 scrollContainer.addEventListener('focusin', () => { isPaused = true; });
 scrollContainer.addEventListener('focusout', () => { isPaused = false; });
 
-// Start everything
+// Initialize
 loadSchedule();
 updateClock();
-setInterval(loadSchedule, 3 * 60 * 1000); // reload every 3 mins
-setInterval(updateClock, 1000);            // update clock every sec
+setInterval(loadSchedule, 3 * 60 * 1000); // refresh schedule
+setInterval(updateClock, 1000); // update clock

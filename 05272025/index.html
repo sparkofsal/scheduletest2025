@@ -2,48 +2,36 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>TV Schedule Display</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TPI Weekly Schedule</title>
   <style>
     body {
-      font-family: sans-serif;
       background: #111;
       color: #fff;
-      margin: 0;
+      font-family: sans-serif;
       padding: 2rem;
-      overflow: hidden;
+      margin: 0;
     }
 
-    h1 {
-      font-size: 2rem;
-      margin: 0 0 0.5rem 0;
-    }
-
-    #datetime {
-      font-size: 1.2rem;
-      color: #ccc;
-      margin-bottom: 1.5rem;
+    h1, #datetime {
+      text-align: center;
     }
 
     #table-container {
-      height: 70vh;
-      overflow-y: auto;
-      position: relative;
-      pointer-events: auto; /* Enable hover for pause */
-      border: 1px solid #444;
-      scroll-behavior: smooth;
+      height: 500px;
+      overflow: hidden;
+      border: 2px solid #333;
+      margin-top: 1rem;
     }
 
     #scroll-content {
-      display: inline-block;
-      width: 100%;
+      display: block;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 1.5rem;
-      background-color: #111;
+      font-size: 1.2rem;
     }
 
     th, td {
@@ -54,25 +42,16 @@
 
     th {
       background: #222;
-      position: sticky;
-      top: 0;
-      z-index: 2;
-    }
-
-    #footer {
-      margin-top: 2rem;
-      font-size: 0.9rem;
-      color: #aaa;
     }
   </style>
 </head>
 <body>
-  <h1> Live Schedule</h1>
+  <h1>Weekly Schedule</h1>
   <div id="datetime">Loading time...</div>
-  <div id="table-container" tabindex="0">
-    <div id="scroll-content"></div>
+
+  <div id="table-container">
+    <div id="scroll-content">Loading schedule...</div>
   </div>
-  <div id="footer">Auto-scrolls • Updates every 3 minutes • Powered by Google Sheets</div>
 
   <script src="script.js"></script>
 </body>
